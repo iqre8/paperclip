@@ -69,7 +69,7 @@ interface IssueDraft {
   assigneeUseProjectWorkspace: boolean;
 }
 
-const ISSUE_OVERRIDE_ADAPTER_TYPES = new Set(["claude_local", "codex_local", "opencode_local"]);
+const ISSUE_OVERRIDE_ADAPTER_TYPES = new Set(["claude_local", "codex_local", "opencode_local", "kimi_local"]);
 
 const ISSUE_THINKING_EFFORT_OPTIONS = {
   claude_local: [
@@ -92,6 +92,11 @@ const ISSUE_THINKING_EFFORT_OPTIONS = {
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" },
     { value: "max", label: "Max" },
+  ],
+  kimi_local: [
+    { value: "", label: "Default" },
+    { value: "on", label: "On" },
+    { value: "off", label: "Off" },
   ],
 } as const;
 
@@ -116,8 +121,8 @@ function buildAssigneeAdapterOverrides(input: {
       adapterConfig.variant = input.thinkingEffortOverride;
     } else if (adapterType === "claude_local") {
       adapterConfig.effort = input.thinkingEffortOverride;
-    } else if (adapterType === "opencode_local") {
-      adapterConfig.variant = input.thinkingEffortOverride;
+    } else if (adapterType === "kimi_local") {
+      adapterConfig.thinking = input.thinkingEffortOverride === "on";
     }
   }
   if (adapterType === "claude_local" && input.chrome) {
@@ -472,13 +477,17 @@ export function NewIssueDialog() {
         ? "Codex options"
         : assigneeAdapterType === "opencode_local"
           ? "OpenCode options"
-        : "Agent options";
+          : assigneeAdapterType === "kimi_local"
+            ? "Kimi options"
+            : "Agent options";
   const thinkingEffortOptions =
     assigneeAdapterType === "codex_local"
       ? ISSUE_THINKING_EFFORT_OPTIONS.codex_local
       : assigneeAdapterType === "opencode_local"
         ? ISSUE_THINKING_EFFORT_OPTIONS.opencode_local
-      : ISSUE_THINKING_EFFORT_OPTIONS.claude_local;
+        : assigneeAdapterType === "kimi_local"
+          ? ISSUE_THINKING_EFFORT_OPTIONS.kimi_local
+          : ISSUE_THINKING_EFFORT_OPTIONS.claude_local;
   const recentAssigneeIds = useMemo(() => getRecentAssigneeIds(), [newIssueOpen]);
   const assigneeOptions = useMemo<InlineEntityOption[]>(
     () =>

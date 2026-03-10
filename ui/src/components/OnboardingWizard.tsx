@@ -54,6 +54,7 @@ type AdapterType =
   | "codex_local"
   | "opencode_local"
   | "cursor"
+  | "kimi_local"
   | "process"
   | "http"
   | "openclaw";
@@ -165,7 +166,7 @@ export function OnboardingWizard() {
     enabled: Boolean(createdCompanyId) && onboardingOpen && step === 2
   });
   const isLocalAdapter =
-    adapterType === "claude_local" || adapterType === "codex_local" || adapterType === "opencode_local" || adapterType === "cursor";
+    adapterType === "claude_local" || adapterType === "codex_local" || adapterType === "opencode_local" || adapterType === "cursor" || adapterType === "kimi_local";
   const effectiveAdapterCommand =
     command.trim() ||
     (adapterType === "codex_local"
@@ -270,7 +271,9 @@ export function OnboardingWizard() {
           ? model || DEFAULT_CODEX_LOCAL_MODEL
           : adapterType === "cursor"
             ? model || DEFAULT_CURSOR_LOCAL_MODEL
-          : model,
+            : adapterType === "kimi_local"
+              ? model || "kimi-for-coding"
+              : model,
       command,
       args,
       url,
@@ -679,6 +682,12 @@ export function OnboardingWizard() {
                           desc: "Local Cursor agent"
                         },
                         {
+                          value: "kimi_local" as const,
+                          label: "Kimi",
+                          icon: Bot,
+                          desc: "Local Kimi agent"
+                        },
+                        {
                           value: "process" as const,
                           label: "Shell Command",
                           icon: Terminal,
@@ -712,6 +721,8 @@ export function OnboardingWizard() {
                               setModel(DEFAULT_CODEX_LOCAL_MODEL);
                             } else if (nextType === "cursor" && !model) {
                               setModel(DEFAULT_CURSOR_LOCAL_MODEL);
+                            } else if (nextType === "kimi_local" && !model) {
+                              setModel("kimi-for-coding");
                             }
                             if (nextType === "opencode_local") {
                               if (!model.includes("/")) {
@@ -741,7 +752,8 @@ export function OnboardingWizard() {
                   {(adapterType === "claude_local" ||
                     adapterType === "codex_local" ||
                     adapterType === "opencode_local" ||
-                    adapterType === "cursor") && (
+                    adapterType === "cursor" ||
+                    adapterType === "kimi_local") && (
                     <div className="space-y-3">
                       <div>
                         <div className="flex items-center gap-1.5 mb-1">
@@ -913,17 +925,19 @@ export function OnboardingWizard() {
                             ? `${effectiveAdapterCommand} exec --json -`
                             : adapterType === "opencode_local"
                               ? `${effectiveAdapterCommand} run --format json "Respond with hello."`
+                            : adapterType === "kimi_local"
+                              ? `${effectiveAdapterCommand} --print --output-format stream-json --verbose`
                             : `${effectiveAdapterCommand} --print - --output-format stream-json --verbose`}
                         </p>
                         <p className="text-muted-foreground">
                           Prompt:{" "}
                           <span className="font-mono">Respond with hello.</span>
                         </p>
-                        {adapterType === "cursor" || adapterType === "codex_local" || adapterType === "opencode_local" ? (
+                        {adapterType === "cursor" || adapterType === "codex_local" || adapterType === "opencode_local" || adapterType === "kimi_local" ? (
                           <p className="text-muted-foreground">
                             If auth fails, set{" "}
                             <span className="font-mono">
-                              {adapterType === "cursor" ? "CURSOR_API_KEY" : "OPENAI_API_KEY"}
+                              {adapterType === "cursor" ? "CURSOR_API_KEY" : adapterType === "kimi_local" ? "KIMI_API_KEY" : "OPENAI_API_KEY"}
                             </span>{" "}
                             in
                             env or run{" "}
@@ -932,7 +946,9 @@ export function OnboardingWizard() {
                                 ? "agent login"
                                 : adapterType === "codex_local"
                                   ? "codex login"
-                                  : "opencode auth login"}
+                                  : adapterType === "kimi_local"
+                                    ? "kimi login"
+                                    : "opencode auth login"}
                             </span>.
                           </p>
                         ) : (

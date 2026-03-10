@@ -55,6 +55,7 @@ export const adapterLabels: Record<string, string> = {
   opencode_local: "OpenCode (local)",
   openclaw: "OpenClaw",
   cursor: "Cursor (local)",
+  kimi_local: "Kimi (local)",
   process: "Process",
   http: "HTTP",
 };

@@ -28,6 +28,7 @@ export const AGENT_ADAPTER_TYPES = [
   "codex_local",
   "opencode_local",
   "cursor",
+  "kimi_local",
   "openclaw",
 ] as const;
 export type AgentAdapterType = (typeof AGENT_ADAPTER_TYPES)[number];

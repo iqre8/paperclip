@@ -18,6 +18,12 @@ import {
 } from "@paperclipai/adapter-cursor-local/server";
 import { agentConfigurationDoc as cursorAgentConfigurationDoc, models as cursorModels } from "@paperclipai/adapter-cursor-local";
 import {
+  execute as kimiExecute,
+  testEnvironment as kimiTestEnvironment,
+  sessionCodec as kimiSessionCodec,
+} from "@paperclipai/adapter-kimi-local/server";
+import { agentConfigurationDoc as kimiAgentConfigurationDoc, models as kimiModels } from "@paperclipai/adapter-kimi-local";
+import {
   execute as openCodeExecute,
   testEnvironment as openCodeTestEnvironment,
   sessionCodec as openCodeSessionCodec,
@@ -72,6 +78,16 @@ const cursorLocalAdapter: ServerAdapterModule = {
   agentConfigurationDoc: cursorAgentConfigurationDoc,
 };
 
+const kimiLocalAdapter: ServerAdapterModule = {
+  type: "kimi_local",
+  execute: kimiExecute,
+  testEnvironment: kimiTestEnvironment,
+  sessionCodec: kimiSessionCodec,
+  models: kimiModels,
+  supportsLocalAgentJwt: true,
+  agentConfigurationDoc: kimiAgentConfigurationDoc,
+};
+
 const openclawAdapter: ServerAdapterModule = {
   type: "openclaw",
   execute: openclawExecute,
@@ -94,7 +110,7 @@ const openCodeLocalAdapter: ServerAdapterModule = {
 };
 
 const adaptersByType = new Map<string, ServerAdapterModule>(
-  [claudeLocalAdapter, codexLocalAdapter, openCodeLocalAdapter, cursorLocalAdapter, openclawAdapter, processAdapter, httpAdapter].map((a) => [a.type, a]),
+  [claudeLocalAdapter, codexLocalAdapter, openCodeLocalAdapter, cursorLocalAdapter, kimiLocalAdapter, openclawAdapter, processAdapter, httpAdapter].map((a) => [a.type, a]),
 );
 
 export function getServerAdapter(type: string): ServerAdapterModule {
