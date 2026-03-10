@@ -17,10 +17,11 @@ COPY packages/adapters/claude-local/package.json packages/adapters/claude-local/
 COPY packages/adapters/codex-local/package.json packages/adapters/codex-local/
 COPY packages/adapters/cursor-local/package.json packages/adapters/cursor-local/
 COPY packages/adapters/kimi-local/package.json packages/adapters/kimi-local/
-COPY packages/adapters/openclaw/package.json packages/adapters/openclaw/
+COPY packages/adapters/openclaw-gateway/package.json packages/adapters/openclaw-gateway/
 COPY packages/adapters/opencode-local/package.json packages/adapters/opencode-local/
-#RUN pnpm install --frozen-lockfile
-RUN pnpm install -no-frozen-lockfile
+COPY packages/adapters/pi-local/package.json packages/adapters/pi-local/
+
+RUN pnpm install --frozen-lockfile
 
 FROM base AS build
 WORKDIR /app
@@ -33,12 +34,12 @@ RUN test -f server/dist/index.js || (echo "ERROR: server build output missing" &
 FROM base AS production
 WORKDIR /app
 COPY --from=build /app /app
-RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest \
+RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai \
   && export PATH="$HOME/.local/bin:$PATH" \
   && curl -LsSf https://code.kimi.com/install.sh | bash \
   && cp -r $HOME/.local/bin/* /usr/local/bin/ \
   && mkdir -p /paperclip/.kimi \
-  && echo 'default_model = "kimi-for-coding"\ndefault_thinking = true\ndefault_yolo = false\n\n[models."kimi-for-coding"]\nprovider = "kimi-code"\nmodel = "kimi-for-coding"\n\n[providers."kimi-code"]\ntype = "kimi"\nbase_url = "https://api.kimi.com/coding/v1"\napi_key = ""\n\n[loop_control]\nmax_steps_per_turn = 100\nmax_retries_per_step = 3\nmax_ralph_iterations = 0\nreserved_context_size = 50000' > /paperclip/.kimi/config.toml
+  && echo 'default_model = "kimi-for-coding"\ndefault_thinking = true\ndefault_yolo = false\n\n[models."kimi-for-coding"]\nprovider = "kimi-code"\nmodel = "kimi-for-coding"\nmax_context_size = 262144\ncapabilities = ["thinking", "video_in", "image_in"]\n\n[providers."kimi-code"]\ntype = "kimi"\nbase_url = "https://api.kimi.com/coding/v1"\napi_key = ""\n\n[loop_control]\nmax_steps_per_turn = 100\nmax_retries_per_step = 3\nmax_ralph_iterations = 0\nreserved_context_size = 50000\n\n[mcp.client]\ntool_call_timeout_ms = 60000' > /paperclip/.kimi/config.toml
 
 ENV NODE_ENV=production \
   HOME=/paperclip \

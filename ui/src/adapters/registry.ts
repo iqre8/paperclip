@@ -4,12 +4,23 @@ import { codexLocalUIAdapter } from "./codex-local";
 import { cursorLocalUIAdapter } from "./cursor";
 import { kimiLocalUIAdapter } from "./kimi-local";
 import { openCodeLocalUIAdapter } from "./opencode-local";
-import { openClawUIAdapter } from "./openclaw";
+import { piLocalUIAdapter } from "./pi-local";
+import { openClawGatewayUIAdapter } from "./openclaw-gateway";
 import { processUIAdapter } from "./process";
 import { httpUIAdapter } from "./http";
 
 const adaptersByType = new Map<string, UIAdapterModule>(
-  [claudeLocalUIAdapter, codexLocalUIAdapter, openCodeLocalUIAdapter, cursorLocalUIAdapter, kimiLocalUIAdapter, openClawUIAdapter, processUIAdapter, httpUIAdapter].map((a) => [a.type, a]),
+  [
+    claudeLocalUIAdapter,
+    codexLocalUIAdapter,
+    openCodeLocalUIAdapter,
+    piLocalUIAdapter,
+    cursorLocalUIAdapter,
+    kimiLocalUIAdapter,
+    openClawGatewayUIAdapter,
+    processUIAdapter,
+    httpUIAdapter,
+  ].map((a) => [a.type, a]),
 );
 
 export function getUIAdapter(type: string): UIAdapterModule {

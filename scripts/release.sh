@@ -115,7 +115,7 @@ const { readFileSync } = require('fs');
 const { resolve } = require('path');
 const root = '$REPO_ROOT';
 const dirs = ['packages/shared', 'packages/adapter-utils', 'packages/db',
-  'packages/adapters/claude-local', 'packages/adapters/codex-local', 'packages/adapters/openclaw',
+  'packages/adapters/claude-local', 'packages/adapters/codex-local', 'packages/adapters/opencode-local', 'packages/adapters/openclaw-gateway',
   'server', 'cli'];
 const names = [];
 for (const d of dirs) {
@@ -221,7 +221,7 @@ const { resolve } = require('path');
 const root = '$REPO_ROOT';
 const wsYaml = readFileSync(resolve(root, 'pnpm-workspace.yaml'), 'utf8');
 const dirs = ['packages/shared', 'packages/adapter-utils', 'packages/db',
-  'packages/adapters/claude-local', 'packages/adapters/codex-local', 'packages/adapters/opencode-local', 'packages/adapters/openclaw',
+  'packages/adapters/claude-local', 'packages/adapters/codex-local', 'packages/adapters/opencode-local', 'packages/adapters/openclaw-gateway',
   'server', 'cli'];
 const names = [];
 for (const d of dirs) {
@@ -279,13 +279,11 @@ pnpm --filter @paperclipai/db build
 pnpm --filter @paperclipai/adapter-claude-local build
 pnpm --filter @paperclipai/adapter-codex-local build
 pnpm --filter @paperclipai/adapter-opencode-local build
-pnpm --filter @paperclipai/adapter-openclaw build
+pnpm --filter @paperclipai/adapter-openclaw-gateway build
 pnpm --filter @paperclipai/server build
 
 # Build UI and bundle into server package for static serving
-pnpm --filter @paperclipai/ui build
-rm -rf "$REPO_ROOT/server/ui-dist"
-cp -r "$REPO_ROOT/ui/dist" "$REPO_ROOT/server/ui-dist"
+bash "$REPO_ROOT/scripts/prepare-server-ui-dist.sh"
 
 # Bundle skills into packages that need them (adapters + server)
 for pkg_dir in server packages/adapters/claude-local packages/adapters/codex-local; do
@@ -314,7 +312,7 @@ if [ "$dry_run" = true ]; then
   echo ""
   echo "  Preview what would be published:"
   for dir in packages/shared packages/adapter-utils packages/db \
-             packages/adapters/claude-local packages/adapters/codex-local packages/adapters/opencode-local packages/adapters/openclaw \
+             packages/adapters/claude-local packages/adapters/codex-local packages/adapters/opencode-local packages/adapters/openclaw-gateway \
              server cli; do
     echo "  --- $dir ---"
     cd "$REPO_ROOT/$dir"

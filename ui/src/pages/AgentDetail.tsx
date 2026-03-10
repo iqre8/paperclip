@@ -24,6 +24,7 @@ import { CopyText } from "../components/CopyText";
 import { EntityRow } from "../components/EntityRow";
 import { Identity } from "../components/Identity";
 import { PageSkeleton } from "../components/PageSkeleton";
+import { ScrollToBottom } from "../components/ScrollToBottom";
 import { formatCents, formatDate, relativeTime, formatTokens } from "../lib/utils";
 import { cn } from "../lib/utils";
 import { Button } from "@/components/ui/button";
@@ -468,7 +469,7 @@ export function AgentDetail() {
             disabled={agentAction.isPending || isPendingApproval}
           >
             <Play className="h-3.5 w-3.5 sm:mr-1" />
-            <span className="hidden sm:inline">Invoke</span>
+            <span className="hidden sm:inline">Run Heartbeat</span>
           </Button>
           {agent.status === "paused" ? (
             <Button
@@ -1747,6 +1748,7 @@ function RunDetail({ run, agentRouteId, adapterType }: { run: HeartbeatRun; agen
 
       {/* Log viewer */}
       <LogViewer run={run} adapterType={adapterType} />
+      <ScrollToBottom />
     </div>
   );
 }
